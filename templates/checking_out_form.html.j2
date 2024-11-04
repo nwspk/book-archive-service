@@ -1,0 +1,58 @@
+<html lang="en">
+<head>
+    <!--here add the bootstrap stuff-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <title>Book checking out form</title></head>
+<body>
+<!--nice background with our books maybe-->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col">
+    <h1>Book checking out form</h1>
+    <p>
+        <b>The provisional rules for the book archive are:</b>
+    <ul>
+        <li>When checking out a book, submit it in the checking out form and then take the book out.</li>
+        <li>When returning a book, submit it in the returning book form and then put the book back.
+            <ul>
+                <li>Since bookshelf space organization is still being worked on, which shelf and where you put the book back doesn’t matter for now, but try to put it roughly where it was before so that people who remember it was there have an easier time finding it.</li>
+            </ul>
+        </li>
+        <li>Don’t steal and/or destroy books!</li>
+     </ul>
+    </p>
+
+    <hr>
+            <div class="container">
+                <form class="row" action="/checkout_book_form_submit" method="post">
+                    <div class="col-md-4 pt-3"><label for="book_data_list" class="form-label">Which book are you checking out?</label>
+                        <input class="form-control" list="bookOptions" name="book_data_list" id="book_data_list" placeholder="Type to search..." />
+                        <datalist id="bookOptions">
+                            <!--here we will insert all 500 books, I am sure nothing will go wrong-->
+                            {% for book in books %}
+                            <option value="{{book}}">
+                            {% endfor %}
+
+                        </datalist></div>
+                    <div class="col-md-4 pt-3"><label for="borrower_data_list" class="form-label">Who are you?</label>
+                        <input class="form-control" list="borrowerOptions" name="borrower_data_list" id="borrower_data_list" placeholder="Type to search..." />
+                        <datalist id="borrowerOptions">
+                            <!--here we will insert all 15 fellows, plus maybe faculty-->
+                            {% for user in users %}
+                            <option value="{{user}}">
+                            {% endfor %}
+                        </datalist></div>
+                    <div class="col-12 mt-3">
+                        <button type="submit" class="btn btn-dark">Check out</button>
+                    </div>
+                </form>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
