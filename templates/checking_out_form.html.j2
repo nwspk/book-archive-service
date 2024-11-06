@@ -47,6 +47,7 @@
                 </form>
                 <script>
                     var books = [];
+                    var users = [];
                     var $book_dropdown = $('#book_data_list');
                     var $user_dropdown = $('#borrower_data_list');
                     var $spinner = $('#spinner');
@@ -81,15 +82,27 @@
                         }
                     };
 
-                    $(document).ready(()=>{
-                        return;
-                        //get data from the server
-                        $.ajax({
+                    var get_book_data = () => {
+                        return  $.ajax({
                             url: "/return_book_data",
                             type: 'GET',
-                            dataType: 'json', // added data type
-                            success: function(res) {
-                                books = res;
+                            dataType: 'json',
+                        });
+                    }
+
+                    var get_user_data = () => {
+                        return  $.ajax({
+                            url: "/return_user_data",
+                            type: 'GET',
+                            dataType: 'json',
+                        });
+                    }
+
+                    $(document).ready(()=>{
+                        $.when(get_book_data(), get_user_data()).done(
+                            function(book_res, user_res) {
+                                books = book_res[0];
+                                users = user_res[0];
 
                                 $book_dropdown.prop("disabled", false);
                                 $user_dropdown.prop("disabled", false);
@@ -111,16 +124,13 @@
                                     valueField: 'id',
                                     labelField: 'name',
                                     searchField: 'name',
-                                    options: books,
+                                    options: users,
                                     create: false,
                                    // render: dropdown_rendering
                                 });
 
                             }
-
-                        });
-
-
+                        );
 
                     })
                 </script>
