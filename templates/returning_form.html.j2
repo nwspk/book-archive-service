@@ -1,0 +1,147 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--here add the bootstrap stuff-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js" integrity="sha512-IOebNkvA/HZjMM7MxL0NYeLYEalloZ8ckak+NDtOViP7oiYzG5vn6WVXyrJDiJPhl4yRdmNAG49iuLmhkUdVsQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.min.css" integrity="sha512-Ars0BmSwpsUJnWMw+KoUKGKunT7+T8NGK0ORRKj+HT8naZzLSIQoOSIIM3oyaJljgLxFi0xImI5oZkAWEFARSA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <title>Book checking out form</title>
+</head>
+<body>
+<!--nice background with our books maybe-->
+<div class="container mt-5">
+    <div class="row">
+        <div class="col">
+    <h1>Book returning form</h1>
+    <p>
+        <b>The provisional rules for the book archive are:</b>
+    <ul>
+        <li>When checking out a book, submit it in the checking out form and then take the book out.</li>
+        <li>When returning a book, submit it in the returning book form and then put the book back.
+            <ul>
+                <li>Since bookshelf space organization is still being worked on, which shelf and where you put the book back doesn’t matter for now, but try to put it roughly where it was before so that people who remember it was there have an easier time finding it.</li>
+            </ul>
+        </li>
+        <li>Don’t steal and/or destroy books!</li>
+     </ul>
+    </p>
+
+    <hr>
+            <div class="container">
+                <form class="row" action="/return_book_form_submit" method="post">
+                    <div class="col-md-12 pt-3"><label for="book_data_list"  class="form-label">Which book are you returning?</label>
+                        <select id="book_data_list" name="book_data_list" required disabled class="form-select form-select-lg" placeholder="Pick a book..."></select>
+                    </div>
+                    <div class="col-md-12 pt-3"><label for="borrower_data_list"  class="form-label">Who are you?</label>
+                        <select id="borrower_data_list" name="borrower_data_list" required disabled class="form-select form-select-lg" placeholder="Pick a name..."></select>
+                    </div>
+                    <div class="col-md-12 d-flex justify-content-center pt-3">
+                        <div class="spinner-grow" id="spinner" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="col-12 mt-3">
+                        <button type="submit" class="btn btn-dark">Check out</button>
+                    </div>
+                </form>
+                <script>
+                    var books = [];
+                    var users = [];
+                    var $book_dropdown = $('#book_data_list');
+                    var $user_dropdown = $('#borrower_data_list');
+                    var $spinner = $('#spinner');
+
+                    var dropdown_rendering = {
+                        item: function (item, escape) {
+                            return (
+                                "<div>" +
+                                (item.name
+                                    ? '<span class="name">' + escape(item.name) + "</span>"
+                                    : "") +
+                                (item.authors
+                                    ? '<span class="email">' + escape(item.authors) + "</span>"
+                                    : "") +
+                                "</div>"
+                            );
+                        },
+                        option: function (item, escape) {
+
+                            var label = item.name || item.authors;
+                            var caption = item.name ? item.authors : null;
+                            return (
+                                "<div class=\"option\">" +
+                                '<span class="fs-4">' +
+                                escape(label) +
+                                "</span>" +
+                                (caption
+                                    ? '<span class="fs-5 ps-3 text-secondary">' + escape(caption) + "</span>"
+                                    : "") +
+                                "</div>"
+                            );
+                        }
+                    };
+
+                    var get_book_data = () => {
+                        return  $.ajax({
+                            url: "/return_taken_out_book_data",
+                            type: 'GET',
+                            dataType: 'json',
+                        });
+                    }
+
+                    var get_user_data = () => {
+                        return  $.ajax({
+                            url: "/return_user_data",
+                            type: 'GET',
+                            dataType: 'json',
+                        });
+                    }
+
+                    $(document).ready(()=>{
+                        $.when(get_book_data(), get_user_data()).done(
+                            function(book_res, user_res) {
+                                books = book_res[0];
+                                users = user_res[0];
+
+                                $book_dropdown.prop("disabled", false);
+                                $user_dropdown.prop("disabled", false);
+
+                                $spinner.hide();
+
+                                $book_dropdown.selectize({
+                                    maxItems: 1,
+                                    valueField: 'id',
+                                    labelField: 'name',
+                                    searchField: 'name',
+                                    options: books,
+                                    create: false,
+                                    render: dropdown_rendering
+                                });
+
+                                $user_dropdown.selectize({
+                                    maxItems: 1,
+                                    valueField: 'id',
+                                    labelField: 'name',
+                                    searchField: 'name',
+                                    options: users,
+                                    create: false,
+                                   // render: dropdown_rendering
+                                });
+
+                            }
+                        );
+
+                    })
+                </script>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
