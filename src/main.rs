@@ -312,10 +312,9 @@ async fn add_access_log_entry(
 
 }
 
-
 #[launch]
 fn rocket() -> _ {
-    let airtable_api_key = std::fs::read_to_string("airtable-token-secret").unwrap();
+    let airtable_api_key = std::env::var("AIRTABLE-TOKEN").expect("AIRTABLE-TOKEN is not set");
     rocket::build()
         .mount("/", routes![
             checkout_book_form_submit,
