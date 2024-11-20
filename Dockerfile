@@ -1,4 +1,4 @@
-FROM docker.io/debian:bookworm-slim
+FROM docker.io/alpine:3.20
 
 WORKDIR /app
 
