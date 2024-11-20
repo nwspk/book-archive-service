@@ -1,4 +1,4 @@
-FROM rust:1.67 as builder
+FROM rust:1.74.0 as builder
 WORKDIR /usr/src/book-archive-service
 COPY . .
 RUN cargo install --path .
