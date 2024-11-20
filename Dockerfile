@@ -11,6 +11,6 @@ COPY  ./template[s] ./templates
 
 ## ensure the container listens globally on port 8080g
 ENV ROCKET_ADDRESS=0.0.0.0
-ENV ROCKET_PORT=8080
+ENV ROCKET_PORT=8090
 
 CMD ./book-archive-service
